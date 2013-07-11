@@ -57,8 +57,18 @@ var checkHtmlFile = function(htmlfile, checksfile) {
     return out;
 };
 
-var checkURLFile = function(urlfile, checksfile) {
-	var 
+var checkURLFile = function(checksfile) {
+	var getURLData = function(result,response) {
+		var checks = loadChecks(checksfile).sort();
+		var out = {};
+		for(var ii in checks) {
+			var present = result.toString.indexOf(checks[ii]) != -1;
+			out[checks[ii]] = present;
+		}
+		var outJson = JSON.stringify(out, null, 4);
+        console.log(outJson);
+	}
+	return getURLData;
 };
 
 var clone = function(fn) {
@@ -75,11 +85,13 @@ if(require.main == module) {
 	.parse(process.argv);
     if(program.file!="") {
 		var checkJson = checkHtmlFile(program.file, program.checks);
+		var outJson = JSON.stringify(checkJson, null, 4);
+    	console.log(outJson);
 	} else {
-		var checkJson = checkURLFile(program.url, program.checks);
+		var checkJson = checkURLFile(program.checks);
+		rest.get(program.url).on('complete',checkJson);
 	}
-    var outJson = JSON.stringify(checkJson, null, 4);
-    console.log(outJson);
+   
 } else {
     exports.checkHtmlFile = checkHtmlFile;
 }
